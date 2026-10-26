@@ -17,8 +17,9 @@ fixes.
 * Use a finite `maxint` fallback on Python 3.
 * Make `dchg()`/`fchg()` tolerate `inf`/`nan` instead of crashing or looping.
 * Drop the `six` dependency and use `collections.abc` (Python 3.9+).
+* Use `python3` in the shebang (no `python` alias required).
 * Add regression tests and GitHub Actions CI.
-* Version 0.8.1.
+* Version 0.8.2.
 
 === Information
 

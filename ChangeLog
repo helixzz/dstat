@@ -1,3 +1,6 @@
+* 0.8.2 - Maintained fork release 2026-10-26
+- Use python3 in the shebang so the script runs without a "python" alias
+
 * 0.8.1 - Maintained fork release 2026-10-26
 - Fix Python 3 network counter crash: net/total could become +inf when an
   interface disappeared (veth removal), killing dchg() with OverflowError
