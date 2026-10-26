@@ -20,7 +20,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Unit tests
         run: python -m unittest discover -s tests -v
-      - name: Version smoke test
-        run: python ./dstat --version
+      - name: Shebang smoke test
+        run: ./dstat --version
       - name: Sampling smoke test
         run: python ./dstat -n 1 1
