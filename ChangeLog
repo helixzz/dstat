@@ -1,3 +1,11 @@
+* 0.8.1 - Maintained fork release 2026-10-26
+- Fix Python 3 network counter crash: net/total could become +inf when an
+  interface disappeared (veth removal), killing dchg() with OverflowError
+- Use a finite maxint fallback on Python 3
+- Make dchg()/fchg() tolerate inf/nan
+- Drop the six dependency and use collections.abc
+- Add regression tests and GitHub Actions CI
+
 * 0.8.0 - To be released
 - Added Python 3 support
 

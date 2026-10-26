@@ -20,6 +20,7 @@ from __future__ import absolute_import, division, generators, print_function
 __metaclass__ = type
 
 import collections
+import collections.abc
 import fnmatch
 import getopt
 import getpass
@@ -29,11 +30,10 @@ import os
 import re
 import resource
 import sched
-import six
 import sys
 import time
 
-VERSION = '0.8.0'
+VERSION = '0.8.1'
 
 theme = { 'default': '' }
 
@@ -418,14 +418,14 @@ class dstat:
 
     def colwidth(self):
         "Return column width"
-        if isinstance(self.name, six.string_types):
+        if isinstance(self.name, str):
             return self.width
         else:
             return len(self.nick) * self.width + len(self.nick) - 1
 
     def title(self):
         ret = theme['title']
-        if isinstance(self.name, six.string_types):
+        if isinstance(self.name, str):
             width = self.statwidth()
             return ret + self.name[0:width].center(width).replace(' ', '-') + theme['default']
         for i, name in enumerate(self.name):
@@ -440,7 +440,7 @@ class dstat:
 
     def subtitle(self):
         ret = ''
-        if isinstance(self.name, six.string_types):
+        if isinstance(self.name, str):
             for i, nick in enumerate(self.nick):
                 ret = ret + theme['subtitle'] + nick[0:self.width].center(self.width) + theme['default']
                 if i + 1 != len(self.nick): ret = ret + char['space']
@@ -454,7 +454,7 @@ class dstat:
             return ret
 
     def csvtitle(self):
-        if isinstance(self.name, six.string_types):
+        if isinstance(self.name, str):
             return '"' + self.name + '"' + char['sep'] * (len(self.nick) - 1)
         else:
             ret = ''
@@ -465,7 +465,7 @@ class dstat:
 
     def csvsubtitle(self):
         ret = ''
-        if isinstance(self.name, six.string_types):
+        if isinstance(self.name, str):
             for i, nick in enumerate(self.nick):
                 ret = ret + '"' + nick + '"'
                 if i + 1 != len(self.nick): ret = ret + char['sep']
@@ -512,7 +512,7 @@ class dstat:
                 scale = self.scales[i]
             else:
                 scale = self.scale
-            if isinstance(self.val[name], collections.Sequence) and not isinstance(self.val[name], six.string_types):
+            if isinstance(self.val[name], collections.abc.Sequence) and not isinstance(self.val[name], str):
                 line = line + cprintlist(self.val[name], ctype, self.width, scale)
                 sep = theme['frame'] + char['colon']
                 if i + 1 != len(self.vars):
@@ -1374,8 +1374,16 @@ class dstat_net(dstat):
         if update:
             for name in self.set2:
                 self.val[name] = list(map(lambda x, y: (y - x) * 1.0 / elapsed, self.set1[name], self.set2[name]))
-                if self.val[name][0] < 0: self.val[name][0] += maxint + 1
-                if self.val[name][1] < 0: self.val[name][1] += maxint + 1
+                # A negative byte delta means the interface disappeared (e.g. a
+                # veth removed together with its container) or its counters were
+                # reset.  64-bit counters do not wrap, and the old wraparound
+                # correction added maxint, which is float("inf") on Python 3.
+                # That poisoned val[] with +inf and made dchg() die with
+                # "OverflowError: cannot convert float infinity to integer".
+                # Keep the delta negative; cprint() renders it as '-'.
+                if sys.version_info[0] == 2:
+                    if self.val[name][0] < 0: self.val[name][0] += maxint + 1
+                    if self.val[name][1] < 0: self.val[name][1] += maxint + 1
 
         if step == op.delay:
             self.set1.update(self.set2)
@@ -2029,6 +2037,10 @@ def snmpwalk(server, community, oid):
 
 def dchg(var, width, base):
     "Convert decimal to string given base and length"
+    ### Defensive: a non-finite value must not reach int(round()), which raises
+    ### OverflowError (inf) or ValueError (nan).  Show it as a dash instead.
+    if var != var or var in (float('inf'), float('-inf')):
+        return '-', 0
     c = 0
     while True:
         ret = str(int(round(var)))
@@ -2042,6 +2054,9 @@ def dchg(var, width, base):
 
 def fchg(var, width, base):
     "Convert float to string given scale and length"
+    ### Defensive: see dchg(); inf/nan would otherwise raise or loop forever.
+    if var != var or var in (float('inf'), float('-inf')):
+        return '-', 0
     c = 0
     while True:
         if var == 0:
@@ -2519,9 +2534,11 @@ def main():
     hz = os.sysconf('SC_CLK_TCK')
     try:
         maxint = (sys.maxint + 1) * 2
-    except:
-        # Support Python 3
-        maxint = float("inf")
+    except AttributeError:
+        # Python 3 has no sys.maxint.  Keep the value finite: it used to be
+        # float("inf"), which leaked into dstat_net's wraparound correction
+        # and crashed dchg() with OverflowError.
+        maxint = 2 ** 64
     ownpid = str(os.getpid())
     pagesize = resource.getpagesize()
     interval = 1

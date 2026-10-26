@@ -1,12 +1,24 @@
-= DSTAT
+= DSTAT (maintained fork)
 
-image:https://travis-ci.org/rear/rear.svg?branch=master["Build Status", link="https://travis-ci.org/dagwieers/dstat"]
+image:https://github.com/helixzz/dstat/actions/workflows/ci.yml/badge.svg["CI", link="https://github.com/helixzz/dstat/actions/workflows/ci.yml"]
 
-=== DSTAT development has been terminated
+This repository is a maintained fork of
+https://github.com/dstat-real/dstat[dstat-real/dstat], the original Dstat by
+Dag Wieers.  The upstream project was shut down and archived in 2020; this fork
+keeps the 0.8.x line usable on current Python 3 distributions and carries bug
+fixes.
 
-Due to actions taken by RedHat to https://github.com/dstat-real/dstat/issues/170[hijack] the DSTAT name, further development of this project has ceased. Development of this project is taking place on the https://github.com/scottchiefbaker/dool[Dool] fork.
+== Changes in this fork
 
-So long and thanks for all the fish
+* Fix `OverflowError: cannot convert float infinity to integer` in `dchg()`
+  when a network interface disappears (for example a veth removed together
+  with its container).  A negative byte delta is no longer "corrected" with
+  `maxint = float("inf")`; it is kept negative and rendered as `-`.
+* Use a finite `maxint` fallback on Python 3.
+* Make `dchg()`/`fchg()` tolerate `inf`/`nan` instead of crashing or looping.
+* Drop the `six` dependency and use `collections.abc` (Python 3.9+).
+* Add regression tests and GitHub Actions CI.
+* Version 0.8.1.
 
 === Information
 
@@ -24,6 +36,6 @@ Dstat's output by default is designed for human consumption in real-time. Dstat 
 
 Since it's practically impossible to test dstat on every possible permutation of kernel, python or distribution version, we need your help and feedback in testing.
 
-If you have improvements or bug reports, please send them to:
+If you have improvements or bug reports, please open an issue at:
 
-    http://github.com/dagwieers/dstat
+    https://github.com/helixzz/dstat/issues
