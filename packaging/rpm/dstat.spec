@@ -4,18 +4,18 @@
 
 Summary: Pluggable real-time performance monitoring tool
 Name: dstat
-Version: 0.7.3
+Version: 0.8.1
 Release: 1
 License: GPL
 Group: System Environment/Base
-URL: http://dag.wieers.com/home-made/dstat/
+URL: https://github.com/helixzz/dstat
 
 Source: http://dag.wieers.com/home-made/dstat/dstat-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildArch: noarch
-BuildRequires: python >= 2.0
-Requires: python >= 2.0
+BuildRequires: python3 >= 3.9
+Requires: python3 >= 3.9
 
 %description
 Dstat is a versatile replacement for vmstat, iostat, netstat and ifstat.
