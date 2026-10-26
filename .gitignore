@@ -1,1 +1,7 @@
 *.pyc
+*.deb
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/dstat/
+debian/*.substvars

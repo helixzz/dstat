@@ -1,0 +1,23 @@
+Source: dstat
+Section: utils
+Priority: optional
+Maintainer: HeliXZz <helixzz@helixzz.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Homepage: https://github.com/helixzz/dstat
+Vcs-Git: https://github.com/helixzz/dstat.git
+Vcs-Browser: https://github.com/helixzz/dstat
+
+Package: dstat
+Architecture: all
+Depends: python3 (>= 3.9), ${misc:Depends}
+Description: versatile resource statistics tool
+ Dstat is a versatile replacement for vmstat, iostat, mpstat, netstat and
+ ifstat. It overcomes some of their limitations while adding extra features,
+ more counters and flexibility. Dstat is handy for monitoring systems during
+ performance tuning tests, benchmarks or troubleshooting.
+ .
+ This package is built from the maintained 0.8.x fork.  It includes the
+ Python 3 fix for network counters that regress when virtual interfaces
+ (veth/tap) disappear or are reset.

@@ -1,0 +1,8 @@
+dstat (0.8.2) unstable; urgency=medium
+
+  * New upstream release from the maintained fork.
+  * Fix Python 3 OverflowError when network interface counters regress
+    (for example when a veth interface is removed with its container).
+  * Use python3 in the shebang and drop the six dependency.
+
+ -- HeliXZz <helixzz@helixzz.com>  Mon, 26 Oct 2026 14:35:00 +0800
