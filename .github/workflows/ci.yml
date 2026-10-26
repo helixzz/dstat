@@ -36,7 +36,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y debhelper fakeroot
+          sudo apt-get install -y build-essential debhelper fakeroot
       - name: Build package
         run: |
           dpkg-buildpackage -us -uc -b
