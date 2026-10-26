@@ -4,6 +4,8 @@ on:
   push:
     branches: [master]
   pull_request:
+  release:
+    types: [published]
 
 jobs:
   test:
@@ -24,3 +26,30 @@ jobs:
         run: ./dstat --version
       - name: Sampling smoke test
         run: python ./dstat -n 1 1
+
+  deb:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential debhelper fakeroot
+      - name: Build package
+        run: |
+          dpkg-buildpackage -us -uc -b
+          cp ../dstat_*_all.deb .
+          dpkg-deb -I dstat_*_all.deb
+          dpkg-deb -c dstat_*_all.deb
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dstat-deb
+          path: dstat_*_all.deb
+      - name: Attach package to release
+        if: github.event_name == 'release'
+        run: gh release upload "${{ github.event.release.tag_name }}" dstat_*_all.deb --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,12 @@
+dstat for Debian
+----------------
+
+This package is built from the maintained fork at
+https://github.com/helixzz/dstat (0.8.x).  It replaces the unmaintained
+0.7.4 package and includes the Python 3 fix for network counter regression:
+a veth/tap interface disappearing used to crash dstat with
+
+    OverflowError: cannot convert float infinity to integer
+
+This is a Debian native package, so the version in debian/changelog is the
+version of this fork.

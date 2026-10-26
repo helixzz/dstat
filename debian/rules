@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# docs/dstat.1 is committed; asciidoc is not required
+
+override_dh_auto_clean:
+	# do not run upstream "make clean": it deletes the committed docs/dstat.1
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/dstat
